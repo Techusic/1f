@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { toast } from "@/hooks/use-toast";
@@ -12,20 +11,32 @@ import { toast } from "@/hooks/use-toast";
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [role, setRole] = useState<"admin" | "project_manager" | "team_member" | "sales_finance">("team_member");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
   const navigate = useNavigate();
+  const [agreed, setAgreed] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      await signup(email, password, name, role);
+      if (!firstName.trim() || !lastName.trim()) {
+        toast({ title: "Missing name", description: "Please provide your first and last name.", variant: "destructive" });
+        return;
+      }
+      if (!agreed) {
+        toast({ title: "Agreement required", description: "You must agree to the Terms & Conditions.", variant: "destructive" });
+        return;
+      }
+
+  const fullName = `${firstName.trim()} ${lastName.trim()}`;
+  // New users sign up as team members by default. Admins assign roles.
+  await signup(email, password, fullName, "team_member");
       toast({ title: "Account created", description: "Welcome to OneFlow!" });
-      navigate("/dashboard");
+      navigate("/projects");
     } catch (error) {
       toast({
         title: "Signup failed",
@@ -57,15 +68,27 @@ export default function Signup() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  placeholder="John"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  placeholder="Doe"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -89,19 +112,10 @@ export default function Signup() {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
-              <Select value={role} onValueChange={(v: any) => setRole(v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="team_member">Team Member</SelectItem>
-                  <SelectItem value="project_manager">Project Manager</SelectItem>
-                  <SelectItem value="sales_finance">Sales/Finance</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Role selection removed: admins assign roles. New signups default to 'team_member'. */}
+            <div className="flex items-start space-x-2">
+              <input id="terms" type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-1" />
+              <label htmlFor="terms" className="text-sm text-muted-foreground">I agree to the <a href="/terms" className="text-primary hover:underline">Terms &amp; Conditions</a></label>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Creating account..." : "Create Account"}

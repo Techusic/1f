@@ -20,9 +20,9 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(email, password);
-      toast({ title: "Login successful", description: "Welcome back!" });
-      navigate("/dashboard");
+  await login(email, password);
+  toast({ title: "Login successful", description: "Welcome back!" });
+      navigate("/projects");
     } catch (error) {
       toast({
         title: "Login failed",
@@ -47,9 +47,9 @@ export default function Login() {
               <span className="text-primary-foreground font-bold text-2xl">O</span>
             </div>
           </div>
-          <CardTitle className="text-2xl text-center">Welcome to OneFlow</CardTitle>
+          <CardTitle className="text-2xl text-center">Log into your account</CardTitle>
           <CardDescription className="text-center">
-            Sign in to manage your projects
+            Enter your credentials to continue
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -76,8 +76,14 @@ export default function Login() {
                 required
               />
             </div>
+            <div className="flex items-center justify-between">
+              <Link to="/forgot-password" className="text-sm text-muted-foreground hover:underline">
+                Forgot password?
+              </Link>
+            </div>
+
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
 

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useProjects } from "@/contexts/ProjectContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { ProjectFormDialog } from "@/components/ProjectFormDialog";
 import { projectsAPI } from "@/lib/api";
 import { Plus, MoreVertical } from "lucide-react";
@@ -22,6 +23,7 @@ import { toast } from "@/hooks/use-toast";
 export default function Projects() {
   const navigate = useNavigate();
   const { projects, refreshProjects } = useProjects();
+  const { user } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<any>(null);
 
@@ -73,10 +75,12 @@ export default function Projects() {
                   Manage and track all your projects
                 </p>
               </div>
-              <Button onClick={() => setIsDialogOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                New Project
-              </Button>
+              {user?.role === "admin" ? (
+                <Button onClick={() => setIsDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Project
+                </Button>
+              ) : null}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
