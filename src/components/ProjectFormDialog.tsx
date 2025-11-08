@@ -18,6 +18,7 @@ import { Project } from "@/data/staticData";
 import { useProjects } from "@/contexts/ProjectContext";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { TeamMemberSelector } from "@/components/TeamMemberSelector";
+import { ProjectManagerSelector } from "@/components/ProjectManagerSelector";
 
 const projectSchema = z.object({
   name: z.string().min(1, "Project name is required"),
@@ -194,9 +195,12 @@ export function ProjectFormDialog({ open, onOpenChange, project }: ProjectFormDi
                 name="manager"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Manager</FormLabel>
+                    <FormLabel>Project Manager</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter manager name" {...field} />
+                      <ProjectManagerSelector
+                        selectedManager={field.value}
+                        onSelectionChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
